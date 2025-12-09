@@ -4,10 +4,14 @@ from PIL import Image
 from pytesseract import pytesseract
 import tempfile
 import os
+import pytesseract
+import PyPDF2
 
-# Set up Tesseract OCR path (Update this path if needed)
-TESSERACT_PATH = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-pytesseract.tesseract_cmd = TESSERACT_PATH
+# Set up Tesseract OCR path
+pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+
+# Set TESSDATA_PREFIX environment variable to point to tessdata directory
+os.environ['TESSDATA_PREFIX'] = r"C:\Program Files\Tesseract-OCR\tessdata"
 
 
 def capture_image():
@@ -33,8 +37,13 @@ def capture_image():
     return image_path
 
 
-def extract_text(image_path):
-    """Extract text from an image using Tesseract OCR."""
+def extract_text(image_path, lang='eng'):
+    """Extract text from an image using Tesseract OCR.
+    
+    Args:
+        image_path: Path to the image file
+        lang: Language code for OCR (default: 'eng')
+    """
     if not os.path.exists(image_path):
         raise FileNotFoundError(f"Image file '{image_path}' not found.")
     
@@ -42,5 +51,24 @@ def extract_text(image_path):
     if image is None:
         raise ValueError("Error loading image. The file may be corrupted or not a valid image format.")
     
-    text = pytesseract.image_to_string(image)
+    text = pytesseract.image_to_string(image, lang=lang)
     return text
+
+
+def extract_text_from_pdf(pdf_file, lang='eng'):
+    """Extract text from a PDF file.
+    
+    Args:
+        pdf_file: PDF file object
+        lang: Language code for OCR (default: 'eng')
+    """
+    text = ""
+    try:
+        pdf_reader = PyPDF2.PdfReader(pdf_file)
+        for page_num in range(len(pdf_reader.pages)):
+            page = pdf_reader.pages[page_num]
+            text += f"\n--- Page {page_num + 1} ---\n"
+            text += page.extract_text()
+        return text
+    except Exception as e:
+        raise Exception(f"Error reading PDF: {str(e)}")
