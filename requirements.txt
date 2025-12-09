@@ -4,3 +4,7 @@ numpy
 Pillow
 pytesseract
 PyPDF2
+deep-translator
+SpeechRecognition
+moviepy
+requests
