@@ -6,12 +6,15 @@ import tempfile
 import os
 import pytesseract
 import PyPDF2
+import platform
 
-# Set up Tesseract OCR path
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-
-# Set TESSDATA_PREFIX environment variable to point to tessdata directory
-os.environ['TESSDATA_PREFIX'] = r"C:\Program Files\Tesseract-OCR\tessdata"
+# Set up Tesseract OCR path based on platform
+# For Streamlit Cloud (Linux), Tesseract is installed via packages.txt
+# For local Windows development, use the Windows path
+if platform.system() == 'Windows':
+    pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+    os.environ['TESSDATA_PREFIX'] = r"C:\Program Files\Tesseract-OCR\tessdata"
+# For Linux/Cloud deployment, tesseract is in PATH, no need to set explicitly
 
 
 def capture_image():
